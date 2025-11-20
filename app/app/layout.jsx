@@ -45,4 +45,9 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
-}
+}<nav className="flex gap-4 text-sm font-medium text-slate-700">
+  <Link href="/pathway" className="hover:text-teal-700">Care Pathway</Link>
+  <Link href="/providers" className="hover:text-teal-700">Find Care</Link>
+  <Link href="/pricing" className="hover:text-teal-700">Pricing</Link>
+  <Link href="/emergency" className="text-red-600 hover:text-red-700 font-semibold">Emergency</Link>
+</nav>

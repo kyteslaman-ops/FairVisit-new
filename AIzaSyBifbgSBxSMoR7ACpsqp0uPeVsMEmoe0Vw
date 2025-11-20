@@ -1,0 +1,84 @@
+import { NextResponse } from "next/server";
+
+// Map UI "type" to Google Places "type" or keyword
+const TYPE_MAP = {
+  clinic: { type: "doctor", keyword: "clinic" },
+  urgent_care: { type: "hospital", keyword: "urgent care" },
+  hospital: { type: "hospital" },
+  lab: { type: "hospital", keyword: "lab" },
+  imaging: { type: "hospital", keyword: "imaging MRI CT" },
+  mental_health: { type: "doctor", keyword: "mental health" }
+};
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const lat = searchParams.get("lat");
+  const lng = searchParams.get("lng");
+  const type = searchParams.get("type") || "clinic";
+  const radius = searchParams.get("radius") || "15000"; // in meters (~9 miles)
+
+  const mapping = TYPE_MAP[type] || TYPE_MAP.clinic;
+
+  // If no coordinates, return a helpful error
+  if (!lat || !lng) {
+    return NextResponse.json(
+      { error: "Missing lat/lng coordinates" },
+      { status: 400 }
+    );
+  }
+
+  const apiKey = process.env.GOOGLE_PLACES_KEY;
+
+  // Fallback if no key on server yet
+  if (!apiKey) {
+    const fake = [
+      {
+        id: "demo-1",
+        name: "Example Community Clinic",
+        address: "123 Sample St",
+        distanceKm: 1.2,
+        rating: 4.5,
+        userRatingsTotal: 38,
+        placeType: "clinic",
+        website: null,
+        phone: null
+      }
+    ];
+    return NextResponse.json({ providers: fake, source: "demo" });
+  }
+
+  try:
+    const url = new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json");
+    url.searchParams.set("key", apiKey);
+    url.searchParams.set("location", `${lat},${lng}`);
+    url.searchParams.set("radius", radius);
+    if (mapping.type) url.searchParams.set("type", mapping.type);
+    if (mapping.keyword) url.searchParams.set("keyword", mapping.keyword);
+
+    const res = await fetch(url.toString());
+    const data = await res.json();
+
+    const providers =
+      (data.results || []).slice(0, 20).map(place => ({
+        id: place.place_id,
+        name: place.name,
+        address: place.vicinity || place.formatted_address,
+        rating: place.rating || null,
+        userRatingsTotal: place.user_ratings_total || 0,
+        placeType: type,
+        // distanceKm: could be calculated with more math; skipping for now
+        distanceKm: null,
+        // Links need a second API call; we just give a Google Maps link for now
+        website: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
+        phone: null
+      }));
+
+    return NextResponse.json({ providers, source: "google_places" });
+  } catch (err) {
+    console.error("Provider search error", err);
+    return NextResponse.json(
+      { error: "Provider search failed" },
+      { status: 500 }
+    );
+  }
+}

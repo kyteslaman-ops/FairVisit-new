@@ -1,53 +1,32 @@
-import "./globals.css";
+import Button from "../components/ui/Button";
 import Link from "next/link";
-import EmergencyButton from "../components/EmergencyButton";
 
-export const metadata = {
-  title: "FairVisit — Know the bill before the visit",
-  description:
-    "FairVisit helps uninsured and underinsured Americans see realistic self-pay prices for visits, scans, and meds and gives simple cost scripts. It is not medical advice."
-};
-
-export default function RootLayout({ children }) {
-  const year = new Date().getFullYear();
-
+export default function HomePage() {
   return (
-    <html lang="en">
-      <body className="bg-slate-50 text-slate-900 min-h-screen">
-        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-600 text-xs font-bold text-white">
-                FV
-              </div>
-              <span className="text-lg font-semibold tracking-tight">FairVisit</span>
-            </Link>
-            <nav className="flex gap-4 text-sm font-medium text-slate-700">
-              <Link href="/pathway" className="hover:text-teal-700">Care Pathway</Link>
-              <Link href="/imaging" className="hover:text-teal-700">Scans</Link>
-              <Link href="/routine-care" className="hover:text-teal-700">Routine</Link>
-              <Link href="/rx" className="hover:text-teal-700">Prescriptions</Link>
-              <Link href="/reviews" className="hover:text-teal-700">Reviews</Link>
-              <Link href="/emergency" className="text-red-600 hover:text-red-700 font-semibold">Emergency</Link>
-            </nav>
-          </div>
-        </header>
-
-        <main className="mx-auto max-w-6xl px-4 py-8">
-          {children}
-        </main>
-
-        <footer className="mt-16 border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-          © {year} FairVisit. Not medical advice. For emergencies call 911 or go to the nearest emergency department.
-        </footer>
-
-        <EmergencyButton />
-      </body>
-    </html>
+    <div className="space-y-6">
+      <section className="card p-6 space-y-3">
+        <p className="inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700 border border-teal-100">
+          2026 uninsured wave · ER bills · no price transparency
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          FairVisit shows self-pay prices before you walk in.
+        </h1>
+        <p className="text-sm text-slate-700">
+          We focus on money only: typical self-pay prices and plain scripts to ask for discounts and estimates.
+          We never tell you whether to seek care. For emergencies, call 911 or go to the nearest ER.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/providers">
+            <Button>Find self-pay options near me</Button>
+          </Link>
+          <Link href="/search">
+            <Button variant="outline">Compare prices by service</Button>
+          </Link>
+        </div>
+        <p className="text-[11px] text-slate-500">
+          Numbers are estimates based on public ranges and user reports. Always confirm the final price with the provider.
+        </p>
+      </section>
+    </div>
   );
-}<nav className="flex gap-4 text-sm font-medium text-slate-700">
-  <Link href="/pathway" className="hover:text-teal-700">Care Pathway</Link>
-  <Link href="/providers" className="hover:text-teal-700">Find Care</Link>
-  <Link href="/pricing" className="hover:text-teal-700">Pricing</Link>
-  <Link href="/emergency" className="text-red-600 hover:text-red-700 font-semibold">Emergency</Link>
-</nav>
+}
